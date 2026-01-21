@@ -26,7 +26,9 @@ def send_telegram_photo(bot_token, chat_id, image_path):
         response = requests.post(url, files=files, data=data, timeout=30)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as e:
         raise ConnectionError(f"Ошибка отправки фото в Telegram: {e}")
 
 
@@ -53,7 +55,7 @@ def main():
     try:
         result = send_telegram_photo(bot_token, chat_id, random_image)
         print("Фото успешно отправлено в Telegram канал")
-    except Exception as e:
+    except (ValueError, FileNotFoundError, ConnectionError) as e:
         print(f"Ошибка: {e}")
 
 
