@@ -13,7 +13,9 @@ def fetch_nasa_apod(api_key, count=30):
     try:
         response = requests.get(url, params=params, timeout=30)
         response.raise_for_status()
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.Timeout, 
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as e:
         raise ConnectionError(f"Не удалось получить данные от NASA APOD API: {e}")
     
     apod_items = response.json()
@@ -34,7 +36,9 @@ def fetch_nasa_apod(api_key, count=30):
         try:
             download_image(image_url, filepath)
             downloaded += 1
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.Timeout,
+                requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as e:
             print(f"Ошибка загрузки {image_url}: {e}")
             continue
     
@@ -56,7 +60,7 @@ def main():
         count = 5 if nasa_api_key == 'DEMO_KEY' else 30
         downloaded = fetch_nasa_apod(nasa_api_key, count)
         print(f"Успешно скачано {downloaded} фото APOD")
-    except Exception as e:
+    except (ValueError, ConnectionError) as e:
         print(f"Ошибка: {e}")
 
 
