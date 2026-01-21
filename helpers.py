@@ -4,8 +4,11 @@ from urllib.parse import urlparse, unquote
 
 
 def download_image(url, filepath, params=None):
-    response = requests.get(url, params=params, timeout=10)
-    response.raise_for_status()
+    try:
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise ConnectionError(f"Ошибка загрузки изображения {url}: {e}")
     
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     
