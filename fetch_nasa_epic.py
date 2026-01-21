@@ -29,7 +29,9 @@ def fetch_nasa_epic(api_key, download_count=5):
             response.raise_for_status()
             api_key = current_key
             break
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.Timeout,
+                requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as e:
             last_error = e
             if attempt == len(keys_to_try):
                 raise ConnectionError(
@@ -61,7 +63,9 @@ def fetch_nasa_epic(api_key, download_count=5):
         try:
             download_image(image_url, filepath, params=download_params)
             downloaded += 1
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.Timeout,
+                requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError) as e:
             print(f"Ошибка загрузки {image_name}: {e}")
             continue
     
@@ -79,7 +83,7 @@ def main():
     try:
         downloaded = fetch_nasa_epic(api_key_to_use)
         print(f"Успешно скачано {downloaded} фото EPIC")
-    except Exception as e:
+    except (ValueError, ConnectionError) as e:
         print(f"Ошибка: {e}")
 
 
