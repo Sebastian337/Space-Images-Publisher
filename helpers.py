@@ -7,7 +7,9 @@ def download_image(url, filepath, params=None):
     try:
         response = requests.get(url, params=params, timeout=30)
         response.raise_for_status()
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as e:
         raise ConnectionError(f"Ошибка загрузки изображения {url}: {e}")
     
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
