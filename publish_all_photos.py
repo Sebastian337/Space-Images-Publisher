@@ -26,7 +26,9 @@ def send_telegram_photo(bot_token, chat_id, image_path):
         response = requests.post(url, files=files, data=data, timeout=30)
         response.raise_for_status()
         return True
-    except requests.exceptions.RequestException:
+    except (requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError):
         return False
 
 
