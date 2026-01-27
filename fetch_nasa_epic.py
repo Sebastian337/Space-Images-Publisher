@@ -13,34 +13,42 @@ def format_date_for_url(date_str):
         return date_str.split()[0].replace('-', '/')
 
 
-def fetch_nasa_epic(api_key, download_count=5):
+def fetch_epic_metadata(api_key):
     metadata_url = 'https://api.nasa.gov/EPIC/api/natural/images'
+    params = {'api_key': api_key}
     
-    keys_to_try = [api_key, 'DEMO_KEY']
-    last_error = None
-    
-    for attempt, current_key in enumerate(keys_to_try, 1):
-        params = {'api_key': current_key}
-        
-        try:
-            response = requests.get(metadata_url, params=params, timeout=30)
-            response.raise_for_status()
-            api_key = current_key
-            break
-        except (requests.exceptions.Timeout,
-                requests.exceptions.HTTPError,
-                requests.exceptions.ConnectionError) as e:
-            last_error = e
-            if attempt == len(keys_to_try):
-                raise ConnectionError(
-                    f"NASA EPIC API недоступен. "
-                    f"Попробовали ключи: {', '.join(k[:8] + '...' for k in keys_to_try)}. "
-                    f"Последняя ошибка: {e}"
-                )
-    
-    epic_metadata = response.json()
-    downloaded = 0
+    try:
+        response = requests.get(metadata_url, params=params, timeout=30)
+        response.raise_for_status()
+        return response.json()
+    except (requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as e:
+        raise ConnectionError(f"Не удалось получить метаданные EPIC: {e}")
 
+
+def build_epic_image_url(image_name, date_str, api_key):
+    date_path = format_date_for_url(date_str)
+    image_url = (
+        f"https://api.nasa.gov/EPIC/archive/natural/"
+        f"{date_path}/png/{image_name}.png"
+    )
+    download_params = {'api_key': api_key}
+    return image_url, download_params
+
+
+def download_epic_images(api_key, download_count=5):
+    try:
+        epic_metadata = fetch_epic_metadata(api_key)
+    except (requests.exceptions.Timeout,
+            requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError) as e:
+        print(f"Пробуем использовать DEMO_KEY из-за ошибки: {e}")
+        epic_metadata = fetch_epic_metadata('DEMO_KEY')
+        api_key = 'DEMO_KEY'
+    
+    downloaded = 0
+    
     for index, meta in enumerate(epic_metadata[:download_count], start=1):
         image_name = meta.get('image')
         date_str = meta.get('date')
@@ -48,13 +56,7 @@ def fetch_nasa_epic(api_key, download_count=5):
         if not image_name or not date_str:
             continue
         
-        date_path = format_date_for_url(date_str)
-        image_url = (
-            f"https://api.nasa.gov/EPIC/archive/natural/"
-            f"{date_path}/png/{image_name}.png"
-        )
-        
-        download_params = {'api_key': api_key}
+        image_url, download_params = build_epic_image_url(image_name, date_str, api_key)
         filename = f"nasa_epic_{index}.png"
         filepath = os.path.join('images', 'nasa_epic', filename)
         
@@ -67,6 +69,11 @@ def fetch_nasa_epic(api_key, download_count=5):
             print(f"Ошибка загрузки {image_name}: {e}")
             continue
     
+    return downloaded
+
+
+def fetch_nasa_epic(api_key, download_count=5):
+    downloaded = download_epic_images(api_key, download_count)
     return downloaded
 
 
@@ -86,5 +93,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
