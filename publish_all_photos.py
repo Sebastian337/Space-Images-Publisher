@@ -2,6 +2,7 @@ import os
 import random
 import time
 import requests
+from dotenv import load_dotenv
 
 
 def get_all_images(images_dir='images'):
@@ -58,7 +59,6 @@ def publish_photos_loop(bot_token, chat_id, delay_hours):
 
 
 def main():
-    from dotenv import load_dotenv
     load_dotenv()
     
     bot_token = os.getenv('TG_BOT_TOKEN')
@@ -81,3 +81,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
