@@ -5,10 +5,7 @@ from helpers import download_image
 
 
 def fetch_spacex_launch(launch_id='latest'):
-    if launch_id == 'latest':
-        url = "https://api.spacexdata.com/v5/launches/latest"
-    else:
-        url = f"https://api.spacexdata.com/v5/launches/{launch_id}"
+    url = f"https://api.spacexdata.com/v5/launches/{launch_id}"
 
     try:
         response = requests.get(url, timeout=30)
