@@ -14,9 +14,6 @@ def format_date_for_url(date_str):
 
 
 def fetch_nasa_epic(api_key, download_count=5):
-    if not api_key:
-        raise ValueError("Не указан API ключ NASA")
-    
     metadata_url = 'https://api.nasa.gov/EPIC/api/natural/images'
     
     keys_to_try = [api_key, 'DEMO_KEY']
@@ -89,4 +86,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
