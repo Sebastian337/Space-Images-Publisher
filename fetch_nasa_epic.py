@@ -1,6 +1,7 @@
 import os
 import requests
 from datetime import datetime
+from dotenv import load_dotenv
 from helpers import download_image
 
 
@@ -73,7 +74,6 @@ def fetch_nasa_epic(api_key, download_count=5):
 
 
 def main():
-    from dotenv import load_dotenv
     load_dotenv()
     
     nasa_api_key = os.getenv('NASA_API_KEY')
@@ -89,3 +89,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
