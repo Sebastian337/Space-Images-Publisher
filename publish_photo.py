@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+from dotenv import load_dotenv
 
 
 def get_all_images(images_dir='images'):
@@ -33,7 +34,6 @@ def send_telegram_photo(bot_token, chat_id, image_path):
 
 
 def main():
-    from dotenv import load_dotenv
     load_dotenv()
     
     bot_token = os.getenv('TG_BOT_TOKEN')
@@ -61,3 +61,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
