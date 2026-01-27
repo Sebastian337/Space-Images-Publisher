@@ -5,9 +5,6 @@ from helpers import download_image, get_file_extension_from_url
 
 
 def fetch_nasa_apod(api_key, count=30):
-    if not api_key:
-        raise ValueError("Не указан API ключ NASA")
-    
     url = 'https://api.nasa.gov/planetary/apod'
     params = {'api_key': api_key, 'count': count}
     
@@ -66,4 +63,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
