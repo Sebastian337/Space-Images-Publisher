@@ -23,14 +23,8 @@ def send_telegram_photo(bot_token, chat_id, image_path):
     files = {'photo': ('photo.jpg', photo_data)}
     data = {'chat_id': chat_id}
     
-    try:
-        response = requests.post(url, files=files, data=data, timeout=30)
-        response.raise_for_status()
-        return True
-    except (requests.exceptions.Timeout,
-            requests.exceptions.HTTPError,
-            requests.exceptions.ConnectionError):
-        return False
+    response = requests.post(url, files=files, data=data, timeout=30)
+    response.raise_for_status()
 
 
 def publish_photos_loop(bot_token, chat_id, delay_hours):
@@ -49,10 +43,13 @@ def publish_photos_loop(bot_token, chat_id, delay_hours):
         for image_path in all_images:
             print(f"Публикую: {os.path.basename(image_path)}")
             
-            if send_telegram_photo(bot_token, chat_id, image_path):
+            try:
+                send_telegram_photo(bot_token, chat_id, image_path)
                 print("Успешно отправлено")
-            else:
-                print("Ошибка отправки")
+            except (requests.exceptions.Timeout,
+                    requests.exceptions.HTTPError,
+                    requests.exceptions.ConnectionError) as e:
+                print(f"Ошибка отправки: {e}")
             
             print(f"Ожидание {delay_hours} часов до следующей публикации...")
             time.sleep(delay_seconds)
@@ -81,4 +78,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
