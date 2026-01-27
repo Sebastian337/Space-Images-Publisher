@@ -1,5 +1,6 @@
 import os
 import requests
+from dotenv import load_dotenv
 from helpers import download_image, get_file_extension_from_url
 
 
@@ -46,7 +47,6 @@ def fetch_nasa_apod(api_key, count=30):
 
 
 def main():
-    from dotenv import load_dotenv
     load_dotenv()
     
     nasa_api_key = os.getenv('NASA_API_KEY')
@@ -66,3 +66,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
